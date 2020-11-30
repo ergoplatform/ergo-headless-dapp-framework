@@ -112,7 +112,18 @@ Currently Implemented Specified Boxes:
 
 `ErgUsdOraclePoolBox` & `AdaUsdOraclePoolBox` provide an extremely simplified interface for both smart contract protocol implementors as well as for front-end implementors for interacting with the two currently running Oracle Pools. These two specified boxes can even be used by wallets/any off-chain application that needs to read the current rates from the Oracle Pool boxes.
 
-Example
+The code block below shows how in 4 lines you can read the current Erg-USD oracle pool rate from your preferred Ergo Explorer API instance:
+
+```rust
+let url = ErgUsdOraclePoolBox::explorer_endpoint("https://api.ergoplatform.com/api").unwrap();
+let response = get(&url).unwrap().text().unwrap();
+let oracle_pool_box =
+    ErgUsdOraclePoolBox::process_explorer_response(&response).unwrap()[0].clone();
+println!(
+    "Erg-USD Oracle Pool: {} nanoErgs per USD",
+    oracle_pool_box.datapoint()
+);
+```
 
 
 ### Output Builders
