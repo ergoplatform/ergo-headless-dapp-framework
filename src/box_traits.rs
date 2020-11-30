@@ -1,7 +1,7 @@
 use crate::box_spec::BoxSpec;
 use crate::encoding::serialize_p2s_from_ergo_tree;
 use crate::error::Result;
-use crate::{ErgoAddressString, NanoErg, P2SAddressString};
+use crate::{NanoErg, P2SAddressString};
 use ergo_lib::ast::constant::Constant;
 use ergo_lib::chain::ergo_box::ErgoBox;
 pub use ergo_lib::chain::token::Token;

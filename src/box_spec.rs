@@ -1,13 +1,10 @@
-use crate::box_traits::{ExplorerFindable, SpecifiedBox, WrappedBox};
 use crate::encoding::address_string_to_ergo_tree;
 use crate::error::{HeadlessDappError, Result};
-use crate::specified_boxes::ErgUsdOraclePoolBox;
 use crate::{ErgoAddressString, NanoErg};
 use ergo_lib::ast::constant::Constant;
 use ergo_lib::chain::ergo_box::ErgoBox;
 use ergo_lib::ergo_tree::ErgoTree;
 use ergo_lib::types::stype::SType;
-use ergo_lib_wasm::box_coll::ErgoBoxes;
 use ergo_lib_wasm::ergo_box::ErgoBox as WErgoBox;
 use serde_json::from_str;
 use std::ops::Range;
@@ -372,6 +369,8 @@ impl BoxSpec {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::box_traits::SpecifiedBox;
+    use crate::specified_boxes::ErgUsdOraclePoolBox;
     #[test]
     fn create_ergo_box_spec() {
         let address = Some(

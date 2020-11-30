@@ -1,6 +1,6 @@
 /// This file holds various functions related to encoding/serialization of values that are relevant
 /// to the oracle core.
-use crate::{ErgoAddressString, P2PKAddressString, P2SAddressString};
+use crate::{ErgoAddressString, P2SAddressString};
 use base16;
 use blake2b_simd::Params;
 use ergo_lib::ast::constant::{Constant, TryExtractFrom};
