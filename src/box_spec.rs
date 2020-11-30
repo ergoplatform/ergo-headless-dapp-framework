@@ -104,8 +104,12 @@ impl BoxSpec {
     }
 
     #[wasm_bindgen]
-    pub fn w_verify_box(&self, ergo_box: WErgoBox) -> bool {
-        todo!()
+    pub fn w_verify_box(&self, wrapped_ergo_box: WErgoBox) -> bool {
+        let b: ErgoBox = wrapped_ergo_box.into();
+        if let Ok(_) = self.verify_box(&b) {
+            return true;
+        }
+        false
     }
 }
 
