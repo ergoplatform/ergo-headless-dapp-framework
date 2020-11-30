@@ -101,16 +101,16 @@ All `ExplorerFindable` structs are also `SpecifiedBox`es which are all `WrappedB
 
 
 ### Specified Boxes
-This module exposes generic "Specified Box" structs that implement the `SpecifiedBox`/`WrappedBox`/`ExplorerFindable` traits, and can be used as inputs for Actions in your off-chain protocol code.
+This module exposes generic "Specified Box" structs that implement the `SpecifiedBox`/`WrappedBox`/`ExplorerFindable` traits. These boxes can be used as inputs for Actions in your off-chain protocol code, while also enabling front-end devs to easily gain access to on-chain data, such as Oracle Pool data.
 
 Currently Implemented Specified Boxes:
 1. ErgsBox
 2. ErgUsdOraclePoolBox
 3. AdaUsdOraclePoolBox
 
-`ErgsBox` are used for acquiring inputs that hold Ergs inside of them for your smart contract protocol actions.
+`ErgsBox` are used for acquiring inputs that hold Ergs inside of them which can be used within your smart contract protocol actions.
 
-`ErgUsdOraclePoolBox` & `AdaUsdOraclePoolBox` provide an extremely simplified interface for both smart contract protocol implementors as well as for front-end implementors for interacting with the two currently running Oracle Pools. These two specified boxes can even be used by wallets/any off-chain application that needs to read the current rates from the Oracle Pool boxes.
+`ErgUsdOraclePoolBox` & `AdaUsdOraclePoolBox` provide an extremely simplified interface for both headless dApp developers as well as front-end implementors to utilize data from the two currently running Oracle Pools. These two specified boxes can even be used by wallets/any off-chain application that needs to read the current rates from the Oracle Pool boxes.
 
 The code block below shows how in 4 lines you can read the current Erg-USD oracle pool rate from your preferred Ergo Explorer API instance:
 
@@ -157,7 +157,7 @@ pub fn serialize_p2s_from_ergo_tree(ergo_tree: ErgoTree) -> P2SAddressString;
 
 ## Getting Started
 
-To learn how to use the HDF a tutorial series has been created which takes you step-by-step in developing your own headless dApp.
+The `Math Bounty Headless dApp` tutorial series has been created to guide you through using the Ergo Headless dApp Framework. You will be lead step-by-step in developing your own headless dApp from project creation all the way to implementing a command line based interface.
 
 Currently available parts:
 1. [Math Bounty Headless dApp - Getting Started Writing Your First Action](tutorials/Math_Bounty/1-math-bounty-dApp-getting-started.md)
