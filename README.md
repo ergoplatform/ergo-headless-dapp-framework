@@ -93,14 +93,15 @@ pub fn verify_box(&self, ergo_box: &ErgoBox) -> Result<()> {
 This module exposes two traits:
 1. `WrappedBox`
 2. `SpecifiedBox`
+3. `ExplorerFindable`
 
-All `SpecifiedBox`es are also `WrappedBox`es. In your off-chain code you will be defining all of your inputs UTXOs to actions as structs that implement both `WrappedBox` and `SpecifiedBox`.
+All `ExplorerFindable` structs are also `SpecifiedBox`es which are all `WrappedBox`es. In your off-chain code you will be defining all of your inputs UTXOs to actions as structs that implement `SpecifiedBox`, while automatically deriving `WrappedBox` and `ExplorerFindable` without any extra work.
 
-`WrappedBox`es provide a simplified interface for interacting with `ErgoBox`es. `SpecifiedBox`es on the other hand specify that a given `WrappedBox` also implements a `BoxSpec` via the `box_spec()` method.
+`WrappedBox`es provide a simplified interface for interacting with `ErgoBox`es. `SpecifiedBox`es on the other hand specify that a given `WrappedBox` also implements a `BoxSpec` via the `box_spec()` method. And lastly `ExplorerFindable` provides an interface on top of the `SpecifiedBox` trait for finding boxes that match the `BoxSpec` from an Ergo Explorer API instance.
 
 
 ### Specified Boxes
-This module exposes generic "Specified Box" structs that implement `SpecifiedBox` and `WrappedBox` traits, and can be used as inputs for Actions in your off-chain protocol code.
+This module exposes generic "Specified Box" structs that implement `SpecifiedBox`/`WrappedBox`/`ExplorerFindable` traits, and can be used as inputs for Actions in your off-chain protocol code.
 
 
 ### Output Builders
