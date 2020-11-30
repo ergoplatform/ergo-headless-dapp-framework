@@ -56,7 +56,7 @@ First we're going to import all of the Ergo-related types and the Ergo Headless 
 pub use ergo_headless_dapp_framework::*;
 ```
 
-At this point we will begin crafting the components of headless dApp by starting off with the stages of our protocol. In our case we have a simple single-stage smart contract protocol. This means we need to only create a single Rust stage-representing struct for our headless dApp.
+At this point we will begin crafting our headless dApp by starting with the stages of our protocol. In our case we have a simple single-stage smart contract protocol. This means we need to create a single Rust stage-representing struct for our headless dApp.
 
 This stage in will be called the `Math Bounty` stage. As such, we will name the struct which will wrap an `ErgoBox` at this stage the `MathBountyBox`.
 
@@ -105,38 +105,17 @@ impl SpecifiedBox for MathBountyBox {
 
 Our Rust-based spec of the Math Bounty stage states that an `ErgoBox` which has an address of `94hWSMqgxHtRNEWoKrJFGVNQEYX34zfX68FNxWr` is a valid `MathBountyBox`. Furthermore this means that no matter what Ergs/registers/tokens the `ErgoBox` has inside, it is still considered a valid `MathBountyBox`. For our simple use case, this is a valid spec for what are going for.
 
-Lastly to finish up with the `MathBountyBox`, we are going to implement the `new` method so that a `MathBountyBox` can be created.
-
-```rust
-impl MathBountyBox {
-    pub fn new(ergo_box: &ErgoBox) -> Option<MathBountyBox> {
-        // Using the automatically implemented `verify_box` method
-        // from the `BoxSpec` to verify the `ErgoBox` is a valid
-        // `MathBountyBox`.
-        Self::box_spec().verify_box(ergo_box).ok()?;
-
-        // Creating the `MathBountyBox`
-        let math_bounty_box = MathBountyBox {
-            ergo_box: ergo_box.clone(),
-        };
-
-        // Returning the `MathBountyBox`
-        Some(math_bounty_box)
-    }
-}
-```
-As can be seen above, we use the `verify_box` method to ensure that the `ErgoBox` is indeed a valid `MathBountyBox` according to the spec we defined. This `verify_box` method is automatically available for use once the `SpecifiedBox` trait has been implemented, as we did above.
 
 ## Defining The Smart Contract Protocol
 
-Going forward, we are going to begin defining the actions of our smart contract protocol for our headless dApp. Before we get there, first we must create an empty struct which represents our protocol. In our case, we are just going to call it `MathBountyProtocol`.
+Going forward, we are going to define the actions of our smart contract protocol for our headless dApp. Before we get there, first we must create an empty struct which represents our protocol. In our case, we are just going to call it `MathBountyProtocol`.
 
 
 ```rust
 pub struct MathBountyProtocol {}
 ```
 
-With a struct that represents our smart contract protocol we can implement protocol actions as methods on said struct. Thus as we expose this `MathBountyProtocol` publicly it will be easy for front-ends to be implemented on top of our headless dApp.
+With this struct that represents our smart contract protocol we can now implement protocol actions as methods on said struct. Thus as we expose this `MathBountyProtocol` publicly it will be easy for front-ends to be implemented on top of our headless dApp.
 
 We will now begin to write our first action, `Bootstrap Math Bounty Box`, by making it a method.
 
@@ -169,7 +148,7 @@ The current height is required for tx building, the transaction fee is to be dec
 
 Furthermore, in our current scenario, we also have the `ergs_box_for_bounty` and `bounty_amount_in_nano_ergs` input arguments. In the front-end the user will provide the amount of nanoErgs they want to submit as a bounty, and the front-end implementation for our headless dApp must find an input `ErgsBox` with sufficient nanoErgs to cover the bounty amount which is owned by the user.
 
-This is actually a lot simpler than it all may sound thanks to the HDF implementing a number of key helper methods on top of `SpecifiedBox`s (an `ErgsBox` being one of the already implemented `SpecifiedBox`es by the HDF) for acquiring UTXOs easily. This will all be tackled in a future tutorial once we are working on building a front-end for our headless dApp.
+This is actually a lot simpler than it all may sound thanks to the HDF implementing a number of key helper methods on top of `SpecifiedBox` & `ExplorerFindable` traits (an `ErgsBox` implements both of these) for acquiring UTXOs easily. This will all be tackled in a future tutorial once we are working on building a front-end for our headless dApp.
 
 Next let's write the basic scaffolding for creating our `UnsignedTransaction` that we are returning in our method:
 
@@ -288,9 +267,9 @@ And with that we have implemented the `Bootstrap Math Bounty Box` action for our
 This is the final code from everything we've accomplished in this tutorial:
 
 ```rust
-use ergo_headless_dapp_framework::*;
+pub use ergo_headless_dapp_framework::*;
 
-#[derive(Debug, Clone, WrapBox)]
+#[derive(Debug, Clone, WrapBox, SpecBox)]
 pub struct MathBountyBox {
     ergo_box: ErgoBox,
 }
@@ -302,26 +281,53 @@ impl SpecifiedBox for MathBountyBox {
     }
 }
 
-impl MathBountyBox {
-    pub fn new(ergo_box: &ErgoBox) -> Option<MathBountyBox> {
-        // Using the automatically implemented `verify_box` method
-        // from the `BoxSpec` to verify the `ErgoBox` is a valid
-        // `MathBountyBox`.
-        Self::box_spec().verify_box(ergo_box).ok()?;
-
-        // Creating the `MathBountyBox`
-        let math_bounty_box = MathBountyBox {
-            ergo_box: ergo_box.clone(),
-        };
-
-        // Returning the `MathBountyBox`
-        Some(math_bounty_box)
-    }
-}
-
 pub struct MathBountyProtocol {}
 
 impl MathBountyProtocol {
+    /// An action to solve the math problem inside of a `MathBountyBox`
+    /// and thus to withdraw the bounty nanoErgs inside as a reward.
+    pub fn action_solve_math_problem(
+        math_problem_answer: u64,
+        math_bounty_box: MathBountyBox,
+        current_height: u64,
+        transaction_fee: u64,
+        ergs_box_for_fee: ErgsBox,
+        user_address: String,
+    ) -> UnsignedTransaction {
+        let tx_inputs = vec![
+            math_bounty_box.as_unsigned_input(),
+            ergs_box_for_fee.as_unsigned_input(),
+        ];
+
+        // Calculating the leftover bounty after paying for the tx fee
+        let bounty_after_fee = math_bounty_box.nano_ergs() - transaction_fee;
+
+        // Converting our `math_problem_answer` from a `u64` to a `Constant`.
+        // This is the datatype that registers are encoded as inside of
+        // `ErgoBox`es. Note: register integers are signed, which is why
+        // we converted first to an `i64`, and then into a `Constant`.
+        let r4 = Constant::from(math_problem_answer as i64);
+
+        // A candidate with the withdrawn bounty funds +  the answer to the
+        // math problem being held in R4.
+        let withdrawn_bounty_candidate = create_candidate(
+            bounty_after_fee,
+            &user_address,
+            &vec![],
+            &vec![r4],
+            current_height,
+        )
+        .unwrap();
+
+        // Create the Transaction Fee box candidate
+        let transaction_fee_candidate =
+            TxFeeBox::output_candidate(transaction_fee, current_height).unwrap();
+
+        let output_candidates = vec![withdrawn_bounty_candidate, transaction_fee_candidate];
+
+        UnsignedTransaction::new(tx_inputs, vec![], output_candidates)
+    }
+
     /// A bootstrap action which allows a user to create a `MathBountyBox`
     /// with funds locked inside as a bounty for solving the math problem.
     pub fn action_bootstrap_math_bounty_box(

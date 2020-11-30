@@ -1,6 +1,6 @@
 pub use ergo_headless_dapp_framework::*;
 
-#[derive(Debug, Clone, WrapBox)]
+#[derive(Debug, Clone, WrapBox, SpecBox)]
 pub struct MathBountyBox {
     ergo_box: ErgoBox,
 }
@@ -9,23 +9,6 @@ impl SpecifiedBox for MathBountyBox {
     fn box_spec() -> BoxSpec {
         let address = Some("94hWSMqgxHtRNEWoKrJFGVNQEYX34zfX68FNxWr".to_string());
         BoxSpec::new(address, None, vec![], vec![])
-    }
-}
-
-impl MathBountyBox {
-    pub fn new(ergo_box: &ErgoBox) -> Option<MathBountyBox> {
-        // Using the automatically implemented `verify_box` method
-        // from the `BoxSpec` to verify the `ErgoBox` is a valid
-        // `MathBountyBox`.
-        Self::box_spec().verify_box(ergo_box).ok()?;
-
-        // Creating the `MathBountyBox`
-        let math_bounty_box = MathBountyBox {
-            ergo_box: ergo_box.clone(),
-        };
-
-        // Returning the `MathBountyBox`
-        Some(math_bounty_box)
     }
 }
 

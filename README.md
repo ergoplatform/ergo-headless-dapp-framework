@@ -125,8 +125,8 @@ This module exposes a number of helpful functions related to encoding/decoding/w
 Examples:
 
 ```rust
-pub fn erg_to_nanoerg(erg_amount: f64) -> u64;
-pub fn nanoerg_to_erg(nanoerg_amount: u64) -> f64;
+pub fn erg_to_nano_erg(erg_amount: f64) -> u64;
+pub fn nano_erg_to_erg(nanoerg_amount: u64) -> f64;
 pub fn unwrap_long(c: &Constant) -> Result<i64>;
 pub fn serialize_p2s_from_ergo_tree(ergo_tree: ErgoTree) -> P2SAddressString;
 ```
