@@ -75,7 +75,7 @@ pub struct MathBountyBox {
 }
 ```
 
-To the Rust-initiated, `Debug` and `Clone` are typical, but `WrapBox` and `SpecBox` are novel. These are procedural macros which automatically implements the `WrappedBox` trait and a `new` method tied to the `SpecifiedBox` trait for our `MathBountyBox`. In other words, we have access to new helper methods without writing any extra code ourselves thanks to these macros. (Note: You must import `HeadlessDappError` if you ever derive `SpecBox`. We do this automatically by importing * in this project.)
+To the Rust-initiated, `Debug` and `Clone` are typical, but `WrapBox` and `SpecBox` are novel. These are procedural macros which automatically implement the `WrappedBox` + `ExplorerFindable` traits in addition to a `new` method tied to the `SpecifiedBox` trait for our `MathBountyBox`. In other words, we have access to new helper methods without writing any extra code ourselves thanks to these macros. (Note: You must import `HeadlessDappError` if you ever derive `SpecBox`. We do this automatically by importing `*` in this project.)
 
 Next we are going to implement the `SpecifiedBox` trait on our `MathBountyBox`, in order to take advantage of the `SpecBox` derive.
 
