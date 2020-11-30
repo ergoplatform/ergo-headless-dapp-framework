@@ -71,7 +71,7 @@ pub trait SpecifiedBox: WrappedBox {
     /// `https://api.ergoplatform.com/api`
     /// This method is intended to be used in tandem with
     /// `process_explorer_response()`
-    fn explorer_endpoint(&self, explorer_api_url: &str) -> Result<String> {
+    fn explorer_endpoint(explorer_api_url: &str) -> Result<String> {
         Self::box_spec().explorer_endpoint(explorer_api_url)
     }
 }

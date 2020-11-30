@@ -101,7 +101,18 @@ All `ExplorerFindable` structs are also `SpecifiedBox`es which are all `WrappedB
 
 
 ### Specified Boxes
-This module exposes generic "Specified Box" structs that implement `SpecifiedBox`/`WrappedBox`/`ExplorerFindable` traits, and can be used as inputs for Actions in your off-chain protocol code.
+This module exposes generic "Specified Box" structs that implement the `SpecifiedBox`/`WrappedBox`/`ExplorerFindable` traits, and can be used as inputs for Actions in your off-chain protocol code.
+
+Currently Implemented Specified Boxes:
+1. ErgsBox
+2. ErgUsdOraclePoolBox
+3. AdaUsdOraclePoolBox
+
+`ErgsBox` are used for acquiring inputs that hold Ergs inside of them for your smart contract protocol actions.
+
+`ErgUsdOraclePoolBox` & `AdaUsdOraclePoolBox` provide an extremely simplified interface for both smart contract protocol implementors as well as for front-end implementors for interacting with the two currently running Oracle Pools. These two specified boxes can even be used by wallets/any off-chain application that needs to read the current rates from the Oracle Pool boxes.
+
+Example
 
 
 ### Output Builders
