@@ -65,8 +65,9 @@ impl ErgsBox {
     }
 }
 
-/// A specified box which is an
-/// Oracle Pool box that stores a `Long` integer datapoint inside of R4.
+/// A specified box which is an Oracle Pool box that stores a `Long` integer
+/// datapoint inside of R4 that represents how many nanoErgs can be bought
+/// for 1 USD.
 #[wasm_bindgen]
 #[derive(Clone, Debug, WrapBox, SpecBox)]
 pub struct ErgUsdOraclePoolBox {
@@ -92,6 +93,49 @@ impl ErgUsdOraclePoolBox {
     pub fn w_new(wb: WErgoBox) -> std::result::Result<ErgUsdOraclePoolBox, JsValue> {
         let b: ErgoBox = wb.into();
         ErgUsdOraclePoolBox::new(&b).map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
+    }
+
+    #[wasm_bindgen]
+    /// Extracts the Long datapoint out of register R4.
+    pub fn datapoint(&self) -> u64 {
+        return unwrap_long(&self.registers()[0]).unwrap() as u64;
+    }
+
+    #[wasm_bindgen]
+    /// Extracts the Long datapoint out of register R4.
+    pub fn datapoint_in_cents(&self) -> u64 {
+        return (self.datapoint() / 100) as u64;
+    }
+}
+
+/// A specified box which is an Oracle Pool box that stores a `Long` integer
+/// datapoint inside of R4 that represents how many lovelaces can be bought
+/// for 1 USD.
+#[wasm_bindgen]
+#[derive(Clone, Debug, WrapBox, SpecBox)]
+pub struct AdaUsdOraclePoolBox {
+    ergo_box: ErgoBox,
+}
+/// SpecifiedBox impl
+impl SpecifiedBox for AdaUsdOraclePoolBox {
+    /// A box spec for an Oracle Pool Box with the correct NFT + a Long value
+    /// in R4
+    fn box_spec() -> BoxSpec {
+        let registers = vec![RegisterSpec::new(Some(SLong), None)];
+        let tokens = vec![Some(TokenSpec::new(
+            1..2,
+            "19475d9a78377ff0f36e9826cec439727bea522f6ffa3bda32e20d2f8b3103ac",
+        ))];
+        BoxSpec::new(None, None, registers, tokens)
+    }
+}
+/// WASM-compatible AdaUsdOraclePoolBox Methods
+#[wasm_bindgen]
+impl AdaUsdOraclePoolBox {
+    #[wasm_bindgen(constructor)]
+    pub fn w_new(wb: WErgoBox) -> std::result::Result<AdaUsdOraclePoolBox, JsValue> {
+        let b: ErgoBox = wb.into();
+        AdaUsdOraclePoolBox::new(&b).map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
     }
 
     #[wasm_bindgen]
