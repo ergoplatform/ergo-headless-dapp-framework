@@ -81,7 +81,7 @@ impl SpecifiedBox for ErgUsdOraclePoolBox {
         let registers = vec![RegisterSpec::new(Some(SLong), None)];
         let tokens = vec![Some(TokenSpec::new(
             1..2,
-            "0fb1eca4646950743bc5a8c341c16871a0ad9b4077e3b276bf93855d51a042d1",
+            "08b59b14e4fdd60e5952314adbaa8b4e00bc0f0b676872a5224d3bf8591074cd",
         ))];
         BoxSpec::new(None, None, registers, tokens)
     }
