@@ -3,6 +3,11 @@ name = "ergo-headless-dapp-framework"
 version = "0.1.0"
 authors = ["Robert Kornacki <11645932+robkorn@users.noreply.github.com>"]
 edition = "2018"
+description = "An easy to use framework for building Ergo headless dApps."
+repository = "https://github.com/Emurgo/ergo-headless-dapp-framework"
+readme = "README.md"
+keywords = ["ergo", "blockchain", "dApp"]
+categories = ["cryptography::cryptocurrencies"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -11,12 +16,12 @@ crate-type = ["cdylib", "rlib"]
 
 
 [dependencies]
-thiserror                        = "1.0.22"
-ergo-lib                         = "0.4.1"
-ergo-lib-wasm                    = "0.4.1"
-serde_json                       = "1.0.59"
-wasm-bindgen                     = "0.2.68"
-blake2b_simd                     = "0.5.11"
-base16                           = "0.2.1"
-json                             = "0.12.4"
-ergo_headless_dapp_framework_derive   = { path = "ergo-headless-dapp-framework-derive", version = "0.1.0"}
+thiserror                           = "1.0.22"
+ergo-lib                            = "0.4.1"
+ergo-lib-wasm                       = "0.4.1"
+serde_json                          = "1.0.59"
+wasm-bindgen                        = "0.2.68"
+blake2b_simd                        = "0.5.11"
+base16                              = "0.2.1"
+json                                = "0.12.4"
+ergo_headless_dapp_framework_derive = "0.1.0"
