@@ -3,6 +3,7 @@ name = "ergo_headless_dapp_framework_derive"
 version = "0.1.0"
 authors = ["Robert Kornacki <11645932+robkorn@users.noreply.github.com>"]
 edition = "2018"
+license = "MIT"
 description = "Procedural macros for the Ergo Headless dApp Framework."
 repository = "https://github.com/Emurgo/ergo-headless-dapp-framework"
 readme = "README.md"
