@@ -19,4 +19,4 @@ wasm-bindgen                     = "0.2.68"
 blake2b_simd                     = "0.5.11"
 base16                           = "0.2.1"
 json                             = "0.12.4"
-ergo_headless_dapp_framework_derive   = { path = "ergo-headless-dapp-framework-derive"}
+ergo_headless_dapp_framework_derive   = { path = "ergo-headless-dapp-framework-derive", version = "0.1.0"}
