@@ -161,6 +161,7 @@ The `Math Bounty Headless dApp` tutorial series has been created to guide you th
 
 Currently available parts:
 1. [Math Bounty Headless dApp - Getting Started Writing Your First Action](tutorials/Math_Bounty/1-math-bounty-dApp-getting-started.md)
+2. [Math Bounty Headless dApp - Finishing The Headless dApp](tutorials/Math_Bounty/2-math-bounty-dApp-finishing-the-headless-dapp.md)
 
 
 

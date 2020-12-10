@@ -1,4 +1,4 @@
-# 2. Math Bounty dApp - Finishing The Off-Chain Library
+# 2. Math Bounty dApp - Finishing The Headless dApp 
 
 In the first tutorial we went from 0 to having a functioning headless with a single action implemented. Granted, we only implemented half of our smart contract protocol (bootstrapping a Math Bounty box), and as such today we are going to fix this glaring hole by implementing the second half of our headless dApp.
 
