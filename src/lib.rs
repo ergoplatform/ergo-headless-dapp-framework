@@ -18,7 +18,9 @@ pub use ergo_lib::types::stype::SType;
 pub use error::{HeadlessDappError, Result};
 pub use output_builders::{ChangeBox, TokensChangeBox, TxFeeBox};
 pub use specified_boxes::{ErgUsdOraclePoolBox, ErgsBox};
-pub use tx_creation::{create_candidate, find_and_sum_other_tokens};
+pub use tx_creation::{
+    create_candidate, find_and_sum_other_tokens, unsigned_transaction_to_assembler_spec,
+};
 
 /// A Base58 encoded String of an Ergo address. Can be either P2PK or P2S.
 pub type ErgoAddressString = String;
