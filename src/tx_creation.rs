@@ -8,8 +8,10 @@ use crate::{BlockHeight, ErgoAddressString, NanoErg};
 use ergo_lib::chain::ergo_box::{BoxValue, ErgoBox, ErgoBoxCandidate, NonMandatoryRegisters};
 use ergo_lib::chain::token::{Token, TokenAmount};
 use ergo_lib::{ast::constant::Constant, chain::transaction::unsigned::UnsignedTransaction};
+use ergo_lib_wasm::transaction::UnsignedTransaction as WUnsignedTransaction;
 use json::object;
 use std::convert::TryFrom;
+use wasm_bindgen::prelude::*;
 
 /// Create an `ErgoBoxCandidate`
 pub fn create_candidate(
@@ -80,6 +82,18 @@ pub fn find_and_sum_other_tokens(
         }
     }
     new_tokens
+}
+
+/// Given an `UnsignedTransaction`, builds a JSON `String` which
+/// is formatted as a transaction spec for working with the
+/// Transaction Assembler Service.
+#[wasm_bindgen]
+pub fn w_unsigned_transaction_to_assembler_spec(
+    wrapped_unsigned_tx: WUnsignedTransaction,
+    transaction_fee: NanoErg,
+) -> String {
+    let unsigned_tx = wrapped_unsigned_tx.into();
+    unsigned_transaction_to_assembler_spec(unsigned_tx, transaction_fee)
 }
 
 /// Given an `UnsignedTransaction`, builds a JSON `String` which
