@@ -162,6 +162,7 @@ The `Math Bounty Headless dApp` tutorial series has been created to guide you th
 Currently available parts:
 1. [Math Bounty Headless dApp - Getting Started Writing Your First Action](tutorials/Math_Bounty/1-math-bounty-dApp-getting-started.md)
 2. [Math Bounty Headless dApp - Finishing The Headless dApp](tutorials/Math_Bounty/2-math-bounty-dApp-finishing-the-headless-dapp.md)
+3. [Math Bounty Headless dApp - Writing A CLI Frontend For Creating Bounties](tutorials/Math_Bounty/3-math-bounty-dApp-writing-a-cli-frontend-that-allows-creating-bounties.md)
 
 
 
