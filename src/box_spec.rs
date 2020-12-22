@@ -108,6 +108,11 @@ impl BoxSpec {
         }
         false
     }
+
+    #[wasm_bindgen]
+    pub fn w_explorer_endpoint(&self, explorer_api_url: &str) -> std::result::Result<String, JsValue> {
+        Ok(self.explorer_endpoint(explorer_api_url).map_err(|e| JsValue::from_str(&format! {"{:?}", e}))?)
+    }
 }
 
 /// Method definitions for `BoxSpec` that are intended to be used in
