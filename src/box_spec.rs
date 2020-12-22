@@ -5,6 +5,7 @@ use ergo_lib::ast::constant::Constant;
 use ergo_lib::chain::ergo_box::ErgoBox;
 use ergo_lib::ergo_tree::ErgoTree;
 use ergo_lib::types::stype::SType;
+use ergo_lib_wasm::box_coll::ErgoBoxes;
 use ergo_lib_wasm::ergo_box::ErgoBox as WErgoBox;
 use serde_json::from_str;
 use std::ops::Range;
@@ -113,7 +114,14 @@ impl BoxSpec {
     pub fn w_explorer_endpoint(&self, explorer_api_url: &str) -> std::result::Result<String, JsValue> {
         Ok(self.explorer_endpoint(explorer_api_url).map_err(|e| JsValue::from_str(&format! {"{:?}", e}))?)
     }
+
+    #[wasm_bindgen]
+    pub fn w_process_explorer_response(&self, explorer_response_body: &str) -> std::result::Result<ErgoBoxes, JsValue> {
+        let boxes = self.process_explorer_response(explorer_response_body).map_err(|e| JsValue::from_str(&format! {"{:?}", e}))?;
+        Ok(ErgoBoxes::from(boxes))
+    }
 }
+
 
 /// Method definitions for `BoxSpec` that are intended to be used in
 /// Rust.
