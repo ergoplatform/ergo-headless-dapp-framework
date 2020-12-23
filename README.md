@@ -153,6 +153,13 @@ pub fn unwrap_long(c: &Constant) -> Result<i64>;
 pub fn serialize_p2s_from_ergo_tree(ergo_tree: ErgoTree) -> P2SAddressString;
 ```
 
+### Procedural Macros
+This crate exposes three procedural macros to make the life of devs much simpler:
+1. WrapBox
+2. SpecBox
+3. WASMBox
+
+`WrapBox` simply implements the `WrappedBox` trait for you, `SpecBox` implements a customized `new()` method that uses your `BoxSpec` + implements the `ExplorerFindable` trait for you, and `WASMBox` implements the two basic required methods to enable WASM support for your struct (`w_new()` and `w_box_struct()`).
 
 
 ## Getting Started
