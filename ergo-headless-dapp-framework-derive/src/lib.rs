@@ -60,3 +60,36 @@ fn impl_specified_box(ast: &syn::DeriveInput) -> TokenStream {
     };
     gen.into()
 }
+
+#[proc_macro_derive(WASMBox)]
+pub fn wasm_box_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+
+    impl_wasm_box(&ast)
+}
+
+fn impl_wasm_box(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let gen = quote! {
+        #[wasm_bindgen]
+        impl #name {
+            #[wasm_bindgen(constructor)]
+            pub fn w_new(ergo_box: WErgoBox) -> std::result::Result<#name, JsValue> {
+                let b: ErgoBox = ergo_box.into();
+                Self::box_spec()
+                    .verify_box(&b)
+                    .map_err(|e| JsValue::from_str(&format! {"{:?}", e}))?;
+                Ok(#name {
+                    ergo_box: b.clone(),
+                })
+            }
+
+            #[wasm_bindgen]
+            pub fn w_box_spec(&self) -> BoxSpec {
+                Self::box_spec()
+            }
+        }
+
+    };
+    gen.into()
+}
