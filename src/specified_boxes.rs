@@ -2,6 +2,7 @@
 /// These are wrapper structs for `ErgoBox`es which meet a given
 /// specification and provide you with a simple interface
 /// for implementing Actions of your protocols.
+use crate::WASMBox;
 use crate::box_spec::BoxSpec;
 use crate::box_traits::{ExplorerFindable, SpecifiedBox, WrappedBox};
 use crate::encoding::unwrap_long;
@@ -18,7 +19,7 @@ use wasm_bindgen::prelude::*;
 /// The spec simply requires the box to simply have at least `1000000`
 /// nanoErgs inside.
 #[wasm_bindgen]
-#[derive(Clone, Debug, WrapBox, SpecBox, Eq, PartialEq)]
+#[derive(Clone, Debug, WrapBox, SpecBox, WASMBox, Eq, PartialEq)]
 pub struct ErgsBox {
     ergo_box: ErgoBox,
 }
@@ -28,16 +29,6 @@ impl SpecifiedBox for ErgsBox {
     /// above `1000000`
     fn box_spec() -> BoxSpec {
         BoxSpec::new(None, Some(1000000..u64::MAX), vec![], vec![])
-    }
-}
-/// WASM-compatible ErgsBox Methods
-#[wasm_bindgen]
-impl ErgsBox {
-    /// Create a new `ErgsBox`
-    #[wasm_bindgen(constructor)]
-    pub fn w_new(wb: WErgoBox) -> std::result::Result<ErgsBox, JsValue> {
-        let b: ErgoBox = wb.into();
-        ErgsBox::new(&b).map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
     }
 }
 /// Rust ErgsBox Methods
@@ -69,7 +60,7 @@ impl ErgsBox {
 /// datapoint inside of R4 that represents how many nanoErgs can be bought
 /// for 1 USD.
 #[wasm_bindgen]
-#[derive(Clone, Debug, WrapBox, SpecBox)]
+#[derive(Clone, Debug, WrapBox, SpecBox, WASMBox)]
 pub struct ErgUsdOraclePoolBox {
     ergo_box: ErgoBox,
 }
@@ -89,12 +80,6 @@ impl SpecifiedBox for ErgUsdOraclePoolBox {
 /// WASM-compatible ErgUsdOraclePoolBox Methods
 #[wasm_bindgen]
 impl ErgUsdOraclePoolBox {
-    #[wasm_bindgen(constructor)]
-    pub fn w_new(wb: WErgoBox) -> std::result::Result<ErgUsdOraclePoolBox, JsValue> {
-        let b: ErgoBox = wb.into();
-        ErgUsdOraclePoolBox::new(&b).map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
-    }
-
     #[wasm_bindgen]
     /// Extracts the Long datapoint out of register R4.
     pub fn datapoint(&self) -> u64 {
@@ -112,7 +97,7 @@ impl ErgUsdOraclePoolBox {
 /// datapoint inside of R4 that represents how many lovelaces can be bought
 /// for 1 USD.
 #[wasm_bindgen]
-#[derive(Clone, Debug, WrapBox, SpecBox)]
+#[derive(Clone, Debug, WrapBox, SpecBox, WASMBox)]
 pub struct AdaUsdOraclePoolBox {
     ergo_box: ErgoBox,
 }
@@ -132,12 +117,6 @@ impl SpecifiedBox for AdaUsdOraclePoolBox {
 /// WASM-compatible AdaUsdOraclePoolBox Methods
 #[wasm_bindgen]
 impl AdaUsdOraclePoolBox {
-    #[wasm_bindgen(constructor)]
-    pub fn w_new(wb: WErgoBox) -> std::result::Result<AdaUsdOraclePoolBox, JsValue> {
-        let b: ErgoBox = wb.into();
-        AdaUsdOraclePoolBox::new(&b).map_err(|e| JsValue::from_str(&format! {"{:?}", e}))
-    }
-
     #[wasm_bindgen]
     /// Extracts the Long datapoint out of register R4.
     pub fn datapoint(&self) -> u64 {
