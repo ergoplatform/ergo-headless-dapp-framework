@@ -60,6 +60,7 @@ fn impl_specified_box(ast: &syn::DeriveInput) -> TokenStream {
 
         #[wasm_bindgen]
         impl #name {
+            #[wasm_bindgen]
             pub fn w_process_explorer_response(explorer_response_body: &str)
                 -> std::result::Result<Vec<JsValue>, JsValue> {
                 let boxes = Self::process_explorer_response(explorer_response_body)
