@@ -57,6 +57,17 @@ fn impl_specified_box(ast: &syn::DeriveInput) -> TokenStream {
             }
         }
 
+
+        #[wasm_bindgen]
+        impl #name {
+            pub fn w_process_explorer_response(explorer_response_body: &str)
+                -> std::result::Result<Vec<JsValue>, JsValue> {
+                let boxes = Self::process_explorer_response(explorer_response_body)
+                                .map_err(|err| JsValue::from_str(&format!("{}", err)))?;
+                Ok(boxes.into_iter().map(JsValue::from).collect())
+            }
+        }
+
     };
     gen.into()
 }
