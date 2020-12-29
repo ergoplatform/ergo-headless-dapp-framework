@@ -57,6 +57,30 @@ fn impl_specified_box(ast: &syn::DeriveInput) -> TokenStream {
             }
         }
 
+
+        #[wasm_bindgen]
+        impl #name {
+
+            #[wasm_bindgen]
+            pub fn w_process_explorer_response(explorer_response_body: &str)
+                -> std::result::Result<Vec<JsValue>, JsValue> {
+                let boxes = Self::process_explorer_response(explorer_response_body)
+                                .map_err(|err| JsValue::from_str(&format!("{}", err)))?;
+                Ok(boxes.into_iter().map(JsValue::from).collect())
+            }
+
+            #[wasm_bindgen]
+            pub fn w_explorer_endpoint(explorer_api_url: &str) -> std::result::Result<String, JsValue> {
+                Self::box_spec().explorer_endpoint(explorer_api_url)
+                                .map_err(|err| JsValue::from_str(&format!("{}", err)))
+            }
+
+            #[wasm_bindgen]
+            pub fn w_box_spec() -> BoxSpec {
+                Self::box_spec()
+            }
+        }
+
     };
     gen.into()
 }
