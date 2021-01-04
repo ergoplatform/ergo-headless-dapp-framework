@@ -1,4 +1,4 @@
-use crate::{NanoErg, encoding::serialize_p2s_from_ergo_tree, ErgsBox, encoding::deserialize_p2s_to_ergo_tree};
+use crate::{NanoErg, encoding::{serialize_p2s_from_ergo_tree, serialize_address_from_ergo_tree}, ErgsBox, encoding::deserialize_p2s_to_ergo_tree};
 use ergo_lib::{chain::transaction::unsigned::UnsignedTransaction, chain::transaction::TxId, chain::ergo_box::{NonMandatoryRegisters, ErgoBox, BoxValue}};
 use ergo_lib_wasm::transaction::UnsignedTransaction as WUnsignedTransaction;
 use json::object;
@@ -54,7 +54,12 @@ impl TxAssemblerSpecBuilder {
             let output = self.unsigned_tx.output_candidates[i].clone();
             // Base values
             tx_spec["requests"][i]["value"] = output.value.as_u64().clone().into();
-            tx_spec["requests"][i]["address"] = serialize_p2s_from_ergo_tree(output.ergo_tree).into();
+            if let Ok(address_string) = serialize_address_from_ergo_tree(output.ergo_tree.clone()) {
+                tx_spec["requests"][i]["address"] = address_string.into();
+            }
+            else {
+                tx_spec["requests"][i]["address"] = serialize_p2s_from_ergo_tree(output.ergo_tree).into();
+            }
 
             // Tokens
             for n in 0..output.tokens.len() {
