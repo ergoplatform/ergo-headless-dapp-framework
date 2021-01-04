@@ -98,11 +98,20 @@ pub fn deserialize_p2s_to_ergo_tree(p2s_address: P2SAddressString) -> Result<Erg
         .map_err(|_| EncodingError::FailedToDeserialize(p2s_address.clone()))
 }
 
-/// Acquire the Base58 encoded P2S Address from a `ErgoTree`
+/// Acquires the Base58 encoded P2S Address from an `ErgoTree`
 pub fn serialize_p2s_from_ergo_tree(ergo_tree: ErgoTree) -> P2SAddressString {
     let address = Address::P2S(ergo_tree.sigma_serialize_bytes());
     let encoder = AddressEncoder::new(NetworkPrefix::Mainnet);
     encoder.address_to_str(&address)
+}
+
+/// Attempts to acquire the Base58 encoded P2S or P2PK Address from an `ErgoTree`
+pub fn serialize_address_from_ergo_tree(ergo_tree: ErgoTree) -> Result<ErgoAddressString> {
+    if let Ok(address) = Address::recreate_from_ergo_tree(&ergo_tree){
+    let encoder = AddressEncoder::new(NetworkPrefix::Mainnet);
+    return Ok(encoder.address_to_str(&address));
+    }
+    Err(EncodingError::FailedToSerialize("Failed to serialize ErgoTree".to_string()))
 }
 
 /// Deserialize ErgoTree inside of a `Constant` acquired from a register of an `ErgoBox` into a P2S Base58 String.
@@ -118,16 +127,6 @@ pub fn deserialize_ergo_tree_constant(c: &Constant) -> Result<P2SAddressString> 
     Ok(encoder.address_to_str(&address))
 }
 
-/// Convert Vec<i8> to Vec<u8>
-fn convert_to_unsigned_bytes(bytes: &Vec<i8>) -> Vec<u8> {
-    bytes.iter().map(|x| x.clone() as u8).collect()
-}
-
-/// Convert Vec<u8> to Vec<i8>
-fn convert_to_signed_bytes(bytes: &Vec<u8>) -> Vec<i8> {
-    bytes.iter().map(|x| x.clone() as i8).collect()
-}
-
 /// Takes an Ergo address (either P2PK or P2S) as a Base58 String and returns
 /// the `ErgoTree` if it is a valid address.
 pub fn address_string_to_ergo_tree(address_str: &ErgoAddressString) -> Result<ErgoTree> {
@@ -139,6 +138,16 @@ pub fn address_string_to_ergo_tree(address_str: &ErgoAddressString) -> Result<Er
         .script()
         .map_err(|_| EncodingError::FailedToSerialize(address_str.to_string()))?;
     Ok(ergo_tree)
+}
+
+/// Convert Vec<i8> to Vec<u8>
+fn convert_to_unsigned_bytes(bytes: &Vec<i8>) -> Vec<u8> {
+    bytes.iter().map(|x| x.clone() as u8).collect()
+}
+
+/// Convert Vec<u8> to Vec<i8>
+fn convert_to_signed_bytes(bytes: &Vec<u8>) -> Vec<i8> {
+    bytes.iter().map(|x| x.clone() as i8).collect()
 }
 
 /// Decodes a hex-encoded string into bytes
