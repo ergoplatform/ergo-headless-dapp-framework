@@ -1,24 +1,29 @@
-use crate::{NanoErg, encoding::{serialize_p2s_from_ergo_tree, serialize_address_from_ergo_tree}, ErgsBox, encoding::deserialize_p2s_to_ergo_tree};
-use ergo_lib::{chain::transaction::unsigned::UnsignedTransaction, chain::transaction::TxId, chain::ergo_box::{NonMandatoryRegisters, ErgoBox, BoxValue}};
+use crate::{
+    encoding::deserialize_p2s_to_ergo_tree,
+    encoding::{serialize_address_from_ergo_tree, serialize_p2s_from_ergo_tree},
+    ErgsBox, NanoErg,
+};
+use ergo_lib::{
+    chain::ergo_box::{BoxValue, ErgoBox, NonMandatoryRegisters},
+    chain::transaction::unsigned::UnsignedTransaction,
+    chain::transaction::TxId,
+};
 use ergo_lib_wasm::transaction::UnsignedTransaction as WUnsignedTransaction;
 use json::object;
 use wasm_bindgen::prelude::*;
-
 
 /// This is a struct which is used to generate Ergo Tx Assembler Spec `String`s
 /// from `UnsignedTransaction`s.
 #[wasm_bindgen]
 pub struct TxAssemblerSpecBuilder {
-    unsigned_tx: UnsignedTransaction
+    unsigned_tx: UnsignedTransaction,
 }
 
 #[wasm_bindgen]
 impl TxAssemblerSpecBuilder {
     /// WASM wrapper for `new()`
     #[wasm_bindgen]
-    pub fn w_new(
-        wrapped_unsigned_tx: WUnsignedTransaction,
-    ) -> Self {
+    pub fn w_new(wrapped_unsigned_tx: WUnsignedTransaction) -> Self {
         let unsigned_tx = wrapped_unsigned_tx.into();
         Self::new(unsigned_tx)
     }
@@ -31,9 +36,17 @@ impl TxAssemblerSpecBuilder {
     #[wasm_bindgen]
     pub fn create_placeholder_ergs_box(nano_ergs: NanoErg) -> Option<ErgsBox> {
         let placeholder_address = "2iHkR7CWvD1R4j1yZg5bkeDRQavjAaVPeTDFGGLZduHyfWMuYpmhHocX8GJoaieTx78FntzJbCBVL6rf96ocJoZdmWBL2fci7NqWgAirppPQmZ7fN9V6z13Ay6brPriBKYqLp1bT2Fk4FkFLCfdPpe".to_string();
-        let ergo_tree =  deserialize_p2s_to_ergo_tree(placeholder_address).ok()?;
+        let ergo_tree = deserialize_p2s_to_ergo_tree(placeholder_address).ok()?;
         let box_value = BoxValue::new(nano_ergs).ok()?;
-        let placeholder_box = ErgoBox::new(box_value, ergo_tree, vec![], NonMandatoryRegisters::empty(), 0, TxId::zero(), 0);
+        let placeholder_box = ErgoBox::new(
+            box_value,
+            ergo_tree,
+            vec![],
+            NonMandatoryRegisters::empty(),
+            0,
+            TxId::zero(),
+            0,
+        );
 
         ErgsBox::new(&placeholder_box).ok()
     }
@@ -42,10 +55,7 @@ impl TxAssemblerSpecBuilder {
     /// is formatted as a transaction spec for working with the
     /// Ergo Transaction Assembler Service.
     #[wasm_bindgen]
-    pub fn build_assembler_spec(
-        &self,
-        transaction_fee: NanoErg,
-    ) -> String {
+    pub fn build_assembler_spec(&self, transaction_fee: NanoErg) -> String {
         let mut tx_spec = object! {
             "requests":  [],
         };
@@ -56,9 +66,9 @@ impl TxAssemblerSpecBuilder {
             tx_spec["requests"][i]["value"] = output.value.as_u64().clone().into();
             if let Ok(address_string) = serialize_address_from_ergo_tree(output.ergo_tree.clone()) {
                 tx_spec["requests"][i]["address"] = address_string.into();
-            }
-            else {
-                tx_spec["requests"][i]["address"] = serialize_p2s_from_ergo_tree(output.ergo_tree).into();
+            } else {
+                tx_spec["requests"][i]["address"] =
+                    serialize_p2s_from_ergo_tree(output.ergo_tree).into();
             }
 
             // Tokens
@@ -119,9 +129,8 @@ impl TxAssemblerSpecBuilder {
 impl TxAssemblerSpecBuilder {
     /// Create a new `TxAssemblerSpecBuilder`
     pub fn new(unsigned_tx: UnsignedTransaction) -> Self {
-       TxAssemblerSpecBuilder {
-           unsigned_tx: unsigned_tx
-       }
+        TxAssemblerSpecBuilder {
+            unsigned_tx: unsigned_tx,
+        }
     }
-
 }

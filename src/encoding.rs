@@ -5,9 +5,12 @@ use base16;
 use blake2b_simd::Params;
 use ergo_lib::ast::constant::{Constant, TryExtractFrom};
 use ergo_lib::chain::address::{Address, AddressEncoder, NetworkPrefix};
-use ergo_lib::chain::Base16EncodedBytes;
+use ergo_lib::chain::token::{Token, TokenAmount, TokenAmountError, TokenId};
+use ergo_lib::chain::{Base16DecodedBytes, Base16EncodedBytes, Digest32, Digest32Error};
 use ergo_lib::ergo_tree::ErgoTree;
 use ergo_lib::serialization::SigmaSerializable;
+// use ergo_lib::
+use std::convert::TryFrom;
 use std::fmt::{Debug, Display};
 use std::str;
 use thiserror::Error;
@@ -22,6 +25,10 @@ pub enum EncodingError<T: Debug + Display> {
     FailedToDeserialize(T),
     #[error("Failed to unwrap: {0}")]
     FailedToUnwrap(T),
+    #[error(transparent)]
+    TokenAmountError(#[from] TokenAmountError),
+    #[error(transparent)]
+    Digest32Error(#[from] Digest32Error),
 }
 
 /// Takes the blake2b hash of a String, then converted into/represented as hex as a String
@@ -107,11 +114,13 @@ pub fn serialize_p2s_from_ergo_tree(ergo_tree: ErgoTree) -> P2SAddressString {
 
 /// Attempts to acquire the Base58 encoded P2S or P2PK Address from an `ErgoTree`
 pub fn serialize_address_from_ergo_tree(ergo_tree: ErgoTree) -> Result<ErgoAddressString> {
-    if let Ok(address) = Address::recreate_from_ergo_tree(&ergo_tree){
-    let encoder = AddressEncoder::new(NetworkPrefix::Mainnet);
-    return Ok(encoder.address_to_str(&address));
+    if let Ok(address) = Address::recreate_from_ergo_tree(&ergo_tree) {
+        let encoder = AddressEncoder::new(NetworkPrefix::Mainnet);
+        return Ok(encoder.address_to_str(&address));
     }
-    Err(EncodingError::FailedToSerialize("Failed to serialize ErgoTree".to_string()))
+    Err(EncodingError::FailedToSerialize(
+        "Failed to serialize ErgoTree".to_string(),
+    ))
 }
 
 /// Deserialize ErgoTree inside of a `Constant` acquired from a register of an `ErgoBox` into a P2S Base58 String.
@@ -138,6 +147,32 @@ pub fn address_string_to_ergo_tree(address_str: &ErgoAddressString) -> Result<Er
         .script()
         .map_err(|_| EncodingError::FailedToSerialize(address_str.to_string()))?;
     Ok(ergo_tree)
+}
+
+/// Builds a `TokenAmount` struct
+pub fn build_token_amount(token_amount: u64) -> Result<TokenAmount> {
+    Ok(TokenAmount::try_from(token_amount)?)
+}
+
+/// Builds a `TokenId` struct
+pub fn build_token_id(token_id: &str) -> Result<TokenId> {
+    Ok(TokenId::from(Digest32::try_from(
+        Base16DecodedBytes::try_from(token_id.to_string())
+            .map_err(|_| EncodingError::FailedToSerialize(token_id.to_string()))?,
+    )?))
+}
+
+/// Builds a `Token` struct using the provided `token_id` and `token_amount`.
+/// Useful when manually constructing transaction logic and requiring
+/// building `Token`s when dealing with the id as a String and the amount
+/// as a u64.
+pub fn build_token(token_id: &str, token_amount: u64) -> Result<Token> {
+    let token_amount = build_token_amount(token_amount)?;
+    let token_id = build_token_id(token_id)?;
+    Ok(Token {
+        token_id: token_id,
+        amount: token_amount,
+    })
 }
 
 /// Convert Vec<i8> to Vec<u8>
@@ -184,5 +219,14 @@ mod tests {
         assert_eq!(erg_to_nano_erg(0.0064), 6400000);
         assert_eq!(erg_to_nano_erg(0.000000064), 64);
         assert_eq!(erg_to_nano_erg(0.000000001), 1);
+    }
+
+    #[test]
+    fn build_token_test() {
+        let t = build_token(
+            "0fb1eca4646950743bc5a8c341c16871a0ad9b4077e3b276bf93855d51a042d1",
+            100000,
+        )
+        .unwrap();
     }
 }
