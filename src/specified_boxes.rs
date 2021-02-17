@@ -1,13 +1,13 @@
-/// This file holds a number of default general "Specified Boxes".
-/// These are wrapper structs for `ErgoBox`es which meet a given
-/// specification and provide you with a simple interface
-/// for implementing Actions of your protocols.
-use crate::WASMBox;
 use crate::box_spec::BoxSpec;
 use crate::box_traits::{ExplorerFindable, SpecifiedBox, WrappedBox};
 use crate::encoding::unwrap_long;
 use crate::error::{HeadlessDappError, Result};
 use crate::SType::SLong;
+/// This file holds a number of default general "Specified Boxes".
+/// These are wrapper structs for `ErgoBox`es which meet a given
+/// specification and provide you with a simple interface
+/// for implementing Actions of your protocols.
+use crate::WASMBox;
 use crate::{RegisterSpec, TokenSpec};
 use ergo_headless_dapp_framework_derive::{SpecBox, WrapBox};
 use ergo_lib::chain::ergo_box::ErgoBox;
@@ -72,7 +72,7 @@ impl SpecifiedBox for ErgUsdOraclePoolBox {
         let registers = vec![RegisterSpec::new(Some(SLong), None)];
         let tokens = vec![Some(TokenSpec::new(
             1..2,
-            "0fb1eca4646950743bc5a8c341c16871a0ad9b4077e3b276bf93855d51a042d1",
+            "54acaa0c6d5d3bc66b88364a423b5f156ed763f7236d437adb44d70787bc0f95",
         ))];
         BoxSpec::new(None, None, registers, tokens)
     }
