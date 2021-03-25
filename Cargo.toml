@@ -1,6 +1,6 @@
 [package]
 name = "ergo-headless-dapp-framework"
-version = "0.1.11"
+version = "0.1.12"
 authors = ["Robert Kornacki <11645932+robkorn@users.noreply.github.com>"]
 edition = "2018"
 license = "MIT"
