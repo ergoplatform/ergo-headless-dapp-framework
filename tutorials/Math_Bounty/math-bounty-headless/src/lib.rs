@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 pub use ergo_headless_dapp_framework::*;
 
 #[derive(Debug, Clone, WrapBox, SpecBox)]
@@ -56,7 +58,12 @@ impl MathBountyProtocol {
 
         let output_candidates = vec![withdrawn_bounty_candidate, transaction_fee_candidate];
 
-        UnsignedTransaction::new(tx_inputs, vec![], output_candidates)
+        UnsignedTransaction::new(
+            tx_inputs.try_into().unwrap(),
+            None,
+            output_candidates.try_into().unwrap(),
+        )
+        .unwrap()
     }
 
     /// A bootstrap action which allows a user to create a `MathBountyBox`
@@ -105,6 +112,11 @@ impl MathBountyProtocol {
             change_box_candidate,
         ];
 
-        UnsignedTransaction::new(tx_inputs, vec![], output_candidates)
+        UnsignedTransaction::new(
+            tx_inputs.try_into().unwrap(),
+            None,
+            output_candidates.try_into().unwrap(),
+        )
+        .unwrap()
     }
 }

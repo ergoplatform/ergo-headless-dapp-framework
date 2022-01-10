@@ -1,15 +1,17 @@
-/// This file holds various functions related to encoding/serialization of values that are relevant
-/// to the oracle core.
 use crate::{ErgoAddressString, P2SAddressString};
 use base16;
 use blake2b_simd::Params;
-use ergo_lib::ast::constant::{Constant, TryExtractFrom};
-use ergo_lib::chain::address::{Address, AddressEncoder, NetworkPrefix};
-use ergo_lib::chain::token::{Token, TokenAmount, TokenAmountError, TokenId};
-use ergo_lib::chain::{Base16DecodedBytes, Base16EncodedBytes, Digest32, Digest32Error};
-use ergo_lib::ergo_tree::ErgoTree;
-use ergo_lib::serialization::SigmaSerializable;
-// use ergo_lib::
+use ergo_lib::ergotree_ir::base16_str::Base16Str;
+use ergo_lib::ergotree_ir::chain::address::{Address, AddressEncoder, NetworkPrefix};
+use ergo_lib::ergotree_ir::chain::base16_bytes::{Base16DecodedBytes, Base16EncodedBytes};
+use ergo_lib::ergotree_ir::chain::digest32::{Digest32, Digest32Error};
+use ergo_lib::ergotree_ir::chain::token::{Token, TokenAmount, TokenAmountError, TokenId};
+use ergo_lib::ergotree_ir::ergo_tree::ErgoTree;
+use ergo_lib::ergotree_ir::mir::constant::Constant;
+/// This file holds various functions related to encoding/serialization of values that are relevant
+/// to the oracle core.
+use ergo_lib::ergotree_ir::mir::constant::TryExtractFrom;
+use ergo_lib::ergotree_ir::serialization::SigmaSerializable;
 use std::convert::TryFrom;
 use std::fmt::{Debug, Display};
 use std::str;
@@ -59,7 +61,7 @@ pub fn serialize_hex_encoded_string(s: &String) -> Result<Constant> {
 pub fn hash_and_serialize_p2s(address: &P2SAddressString) -> Result<Constant> {
     let ergo_tree = address_string_to_ergo_tree(&address)?;
     // Convert into hex-encoded bytes
-    let base16_bytes = Base16EncodedBytes::new(&ergo_tree.sigma_serialize_bytes());
+    let base16_bytes = Base16EncodedBytes::new(&ergo_tree.sigma_serialize_bytes().unwrap());
     // Convert into String
     let ergo_tree_hex_string = base16_bytes.into();
     serialize_hex_encoded_string(&string_to_blake2b_hash(ergo_tree_hex_string)?)
@@ -67,22 +69,24 @@ pub fn hash_and_serialize_p2s(address: &P2SAddressString) -> Result<Constant> {
 
 /// Unwraps a hex-encoded `i32` Int inside of a `Constant` acquired from a register of an `ErgoBox`
 pub fn unwrap_int(c: &Constant) -> Result<i32> {
-    i32::try_extract_from(c.clone()).map_err(|_| EncodingError::FailedToUnwrap(c.base16_str()))
+    i32::try_extract_from(c.clone())
+        .map_err(|_| EncodingError::FailedToUnwrap(c.base16_str().unwrap()))
 }
 
 /// Unwrap a hex-encoded `i64` Long inside of a `Constant` acquired from a register of an `ErgoBox`
 pub fn unwrap_long(c: &Constant) -> Result<i64> {
-    i64::try_extract_from(c.clone()).map_err(|_| EncodingError::FailedToUnwrap(c.base16_str()))
+    i64::try_extract_from(c.clone())
+        .map_err(|_| EncodingError::FailedToUnwrap(c.base16_str().unwrap()))
 }
 
 /// Unwrap a String which is inside of a `Constant` acquired from a register of an `ErgoBox`
 pub fn unwrap_string(c: &Constant) -> Result<String> {
     let byte_array: Result<Vec<u8>> = match Vec::<i8>::try_extract_from(c.clone()) {
         Ok(ba) => Ok(convert_to_unsigned_bytes(&ba)),
-        _ => Err(EncodingError::FailedToUnwrap(c.base16_str())),
+        _ => Err(EncodingError::FailedToUnwrap(c.base16_str().unwrap())),
     };
     Ok(str::from_utf8(&byte_array?)
-        .map_err(|_| EncodingError::FailedToDeserialize(c.base16_str()))?
+        .map_err(|_| EncodingError::FailedToDeserialize(c.base16_str().unwrap()))?
         .to_string())
 }
 
@@ -90,7 +94,7 @@ pub fn unwrap_string(c: &Constant) -> Result<String> {
 pub fn unwrap_hex_encoded_string(c: &Constant) -> Result<String> {
     let byte_array: Result<Vec<u8>> = match Vec::<i8>::try_extract_from(c.clone()) {
         Ok(ba) => Ok(convert_to_unsigned_bytes(&ba)),
-        _ => Err(EncodingError::FailedToUnwrap(c.base16_str())),
+        _ => Err(EncodingError::FailedToUnwrap(c.base16_str().unwrap())),
     };
     Ok(base16::encode_lower(&byte_array?))
 }
@@ -101,13 +105,13 @@ pub fn deserialize_p2s_to_ergo_tree(p2s_address: P2SAddressString) -> Result<Erg
     let address = encoder
         .parse_address_from_str(&p2s_address)
         .map_err(|_| EncodingError::FailedToDeserialize(p2s_address.clone()))?;
-    ErgoTree::sigma_parse_bytes(address.content_bytes())
+    ErgoTree::sigma_parse_bytes(&address.content_bytes())
         .map_err(|_| EncodingError::FailedToDeserialize(p2s_address.clone()))
 }
 
 /// Acquires the Base58 encoded P2S Address from an `ErgoTree`
 pub fn serialize_p2s_from_ergo_tree(ergo_tree: ErgoTree) -> P2SAddressString {
-    let address = Address::P2S(ergo_tree.sigma_serialize_bytes());
+    let address = Address::P2S(ergo_tree.sigma_serialize_bytes().unwrap());
     let encoder = AddressEncoder::new(NetworkPrefix::Mainnet);
     encoder.address_to_str(&address)
 }
@@ -127,7 +131,7 @@ pub fn serialize_address_from_ergo_tree(ergo_tree: ErgoTree) -> Result<ErgoAddre
 pub fn deserialize_ergo_tree_constant(c: &Constant) -> Result<P2SAddressString> {
     let byte_array: Result<Vec<u8>> = match Vec::<i8>::try_extract_from(c.clone()) {
         Ok(ba) => Ok(convert_to_unsigned_bytes(&ba)),
-        _ => Err(EncodingError::FailedToUnwrap(c.base16_str())),
+        _ => Err(EncodingError::FailedToUnwrap(c.base16_str().unwrap())),
     };
 
     let address = Address::P2S(byte_array?);

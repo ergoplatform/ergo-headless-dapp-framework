@@ -8,5 +8,5 @@ edition = "2018"
 
 [dependencies]
 math-bounty-headless    = {path = "../math-bounty-headless"}
-ergo-node-interface     = "0.2.2"
+ergo-node-interface     = "0.2.6"
 reqwest                 = {version ="0.10.9", features = ["blocking"]}
