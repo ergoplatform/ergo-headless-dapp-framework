@@ -1,14 +1,13 @@
-// This file holds a number of functions which aid in tx creation and using the Tx Assembler.
-use crate::error::{HeadlessDappError, Result};
-use crate::{
-    encoding::address_string_to_ergo_tree,
-};
-use crate::{BlockHeight, ErgoAddressString, NanoErg};
-use ergo_lib::chain::ergo_box::{BoxValue, ErgoBox, ErgoBoxCandidate, NonMandatoryRegisters};
-use ergo_lib::chain::token::{Token, TokenAmount};
-use ergo_lib::{ast::constant::Constant,};
-use std::convert::TryFrom;
+use ergo_lib::ergotree_ir::chain::ergo_box::box_value::BoxValue;
+use ergo_lib::ergotree_ir::chain::ergo_box::{ErgoBox, ErgoBoxCandidate, NonMandatoryRegisters};
+use ergo_lib::ergotree_ir::chain::token::{Token, TokenAmount};
+use ergo_lib::ergotree_ir::mir::constant::Constant;
 
+// This file holds a number of functions which aid in tx creation and using the Tx Assembler.
+use crate::encoding::address_string_to_ergo_tree;
+use crate::error::{HeadlessDappError, Result};
+use crate::{BlockHeight, ErgoAddressString, NanoErg};
+use std::convert::TryFrom;
 
 /// Helper function for creating an `ErgoBoxCandidate`
 pub fn create_candidate(
@@ -19,7 +18,7 @@ pub fn create_candidate(
     current_height: BlockHeight,
 ) -> Result<ErgoBoxCandidate> {
     let obb_value = BoxValue::new(value).map_err(|_| HeadlessDappError::InvalidBoxValue(value))?;
-    let obb_registers = NonMandatoryRegisters::from_ordered_values(registers.clone())
+    let obb_registers = NonMandatoryRegisters::try_from(registers.to_owned())
         .map_err(|_| HeadlessDappError::InvalidRegisterValues())?;
     // Obtain ErgoTree of the output_address
     let obb_ergo_tree = address_string_to_ergo_tree(output_address)

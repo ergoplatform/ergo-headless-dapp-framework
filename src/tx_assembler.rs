@@ -4,9 +4,15 @@ use crate::{
     ErgsBox, NanoErg,
 };
 use ergo_lib::{
-    chain::ergo_box::{BoxValue, ErgoBox, NonMandatoryRegisters},
     chain::transaction::unsigned::UnsignedTransaction,
     chain::transaction::TxId,
+    ergotree_ir::{
+        base16_str::Base16Str,
+        chain::{
+            digest32::Digest32,
+            ergo_box::{box_value::BoxValue, ErgoBox, NonMandatoryRegisters},
+        },
+    },
 };
 use ergo_lib_wasm::transaction::UnsignedTransaction as WUnsignedTransaction;
 use json::object;
@@ -46,7 +52,8 @@ impl TxAssemblerSpecBuilder {
             0,
             TxId::zero(),
             0,
-        );
+        )
+        .unwrap();
 
         ErgsBox::new(&placeholder_box).ok()
     }
@@ -61,7 +68,7 @@ impl TxAssemblerSpecBuilder {
         };
 
         for i in 0..self.unsigned_tx.output_candidates.len() {
-            let output = self.unsigned_tx.output_candidates[i].clone();
+            let output = self.unsigned_tx.output_candidates.as_vec()[i].clone();
             // Base values
             tx_spec["requests"][i]["value"] = output.value.as_u64().clone().into();
             if let Ok(address_string) = serialize_address_from_ergo_tree(output.ergo_tree.clone()) {
@@ -74,7 +81,8 @@ impl TxAssemblerSpecBuilder {
             // Tokens
             for n in 0..output.tokens.len() {
                 let token = output.tokens[n].clone();
-                let tok_id: String = token.token_id.0.into();
+                let token_id_digest32: Digest32 = token.token_id.into();
+                let tok_id: String = token_id_digest32.into();
                 let tok_amount: u64 = token.amount.into();
                 tx_spec["requests"][i]["assets"][n]["tokenId"] = tok_id.into();
                 tx_spec["requests"][i]["assets"][n]["amount"] = tok_amount.into();
@@ -84,22 +92,28 @@ impl TxAssemblerSpecBuilder {
             let registers = output.additional_registers.get_ordered_values();
             for y in 0..registers.len() {
                 if y == 0 {
-                    tx_spec["requests"][i]["registers"]["R4"] = registers[y].base16_str().into();
+                    tx_spec["requests"][i]["registers"]["R4"] =
+                        registers[y].base16_str().unwrap().into();
                 }
                 if y == 1 {
-                    tx_spec["requests"][i]["registers"]["R5"] = registers[y].base16_str().into();
+                    tx_spec["requests"][i]["registers"]["R5"] =
+                        registers[y].base16_str().unwrap().into();
                 }
                 if y == 2 {
-                    tx_spec["requests"][i]["registers"]["R6"] = registers[y].base16_str().into();
+                    tx_spec["requests"][i]["registers"]["R6"] =
+                        registers[y].base16_str().unwrap().into();
                 }
                 if y == 3 {
-                    tx_spec["requests"][i]["registers"]["R7"] = registers[y].base16_str().into();
+                    tx_spec["requests"][i]["registers"]["R7"] =
+                        registers[y].base16_str().unwrap().into();
                 }
                 if y == 4 {
-                    tx_spec["requests"][i]["registers"]["R8"] = registers[y].base16_str().into();
+                    tx_spec["requests"][i]["registers"]["R8"] =
+                        registers[y].base16_str().unwrap().into();
                 }
                 if y == 5 {
-                    tx_spec["requests"][i]["registers"]["R9"] = registers[y].base16_str().into();
+                    tx_spec["requests"][i]["registers"]["R9"] =
+                        registers[y].base16_str().unwrap().into();
                 }
             }
 
@@ -109,14 +123,14 @@ impl TxAssemblerSpecBuilder {
             // Inputs
             let inputs = self.unsigned_tx.inputs.clone();
             for y in 0..inputs.len() {
-                let box_id: String = inputs[y].box_id.clone().into();
+                let box_id: String = inputs.as_vec()[y].box_id.clone().into();
                 tx_spec["inputs"][y] = box_id.into();
             }
 
             // Inputs
-            let data_inputs = self.unsigned_tx.data_inputs.clone();
+            let data_inputs = self.unsigned_tx.data_inputs.clone().unwrap();
             for y in 0..data_inputs.len() {
-                let box_id: String = data_inputs[y].box_id.clone().into();
+                let box_id: String = data_inputs.as_vec()[y].box_id.clone().into();
                 tx_spec["dataInputs"][y] = box_id.into();
             }
         }

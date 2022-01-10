@@ -1,3 +1,7 @@
+use ergo_lib::ergotree_ir::chain::ergo_box::{ErgoBox, ErgoBoxCandidate};
+use ergo_lib::ergotree_ir::chain::token::Token;
+use ergo_lib::ergotree_ir::mir::constant::Constant;
+
 /// Structs that provide an interface for creating `ErgoBoxCandidate`s
 /// to be used during tx creation in Actions in a protocol.
 /// These "Output Builders" only provide the ability to create output
@@ -5,9 +9,6 @@
 use crate::error::Result;
 use crate::tx_creation::{create_candidate, find_and_sum_other_tokens};
 use crate::{NanoErg, P2PKAddressString};
-use ergo_lib::ast::constant::Constant;
-use ergo_lib::chain::ergo_box::{ErgoBox, ErgoBoxCandidate};
-use ergo_lib::chain::token::Token;
 
 // /// A function which takes all input boxes/output candidates
 // /// and creates two new output candidates. One tx fee box, and one

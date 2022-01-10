@@ -8,4 +8,4 @@ edition = "2018"
 
 [dependencies]
 ergo-headless-dapp-framework    = {path = "../../../"}
-ergo-lib                     = "0.4.1"
+ergo-lib                     = "0.14.0"
