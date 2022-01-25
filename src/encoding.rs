@@ -140,13 +140,24 @@ pub fn deserialize_ergo_tree_constant(c: &Constant) -> Result<P2SAddressString> 
     Ok(encoder.address_to_str(&address))
 }
 
+// Takes an Ergo address and transforms it into a mainnet address
+// if it fails then it tries to recover by assumming it is a testnet address
+pub fn parse_address(address_str: &ErgoAddressString) -> Result<Address> {
+    let mainnet_encoder = AddressEncoder::new(NetworkPrefix::Mainnet);
+    let testnet_encoder = AddressEncoder::new(NetworkPrefix::Testnet);
+    let address = mainnet_encoder.parse_address_from_str(address_str);
+    return match address {
+        Ok(addr) => Ok(addr),
+        Err(error) => testnet_encoder
+            .parse_address_from_str(address_str)
+            .map_err(|_| EncodingError::FailedToSerialize(address_str.to_string())),
+    };
+}
+
 /// Takes an Ergo address (either P2PK or P2S) as a Base58 String and returns
 /// the `ErgoTree` if it is a valid address.
 pub fn address_string_to_ergo_tree(address_str: &ErgoAddressString) -> Result<ErgoTree> {
-    let encoder = AddressEncoder::new(NetworkPrefix::Mainnet);
-    let address = encoder
-        .parse_address_from_str(address_str)
-        .map_err(|_| EncodingError::FailedToSerialize(address_str.to_string()))?;
+    let address = parse_address(address_str)?;
     let ergo_tree = address
         .script()
         .map_err(|_| EncodingError::FailedToSerialize(address_str.to_string()))?;
